@@ -1,0 +1,118 @@
+fileFormatVersion: 2
+guid: ee76764232f2f4732a62f08169cf773c
+timeCreated: 1433361619
+licenseType: Free
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Box001
+    100002: //RootNode
+    100004: MASERATI QUATTROPORTE
+    100006: MOVE - MASERATI QUATTROPORTE
+    100008: MQP_BADGES
+    100010: MQP_BODY
+    100012: MQP_FLWHEEL
+    100014: MQP_FRWHEEL
+    100016: MQP_GLASS
+    100018: MQP_INTERIOR
+    100020: MQP_LICENSE
+    100022: MQP_RWHEELS
+    400000: Box001
+    400002: //RootNode
+    400004: MASERATI QUATTROPORTE
+    400006: MOVE - MASERATI QUATTROPORTE
+    400008: MQP_BADGES
+    400010: MQP_BODY
+    400012: MQP_FLWHEEL
+    400014: MQP_FRWHEEL
+    400016: MQP_GLASS
+    400018: MQP_INTERIOR
+    400020: MQP_LICENSE
+    400022: MQP_RWHEELS
+    2300000: Box001
+    2300002: MQP_BADGES
+    2300004: MQP_BODY
+    2300006: MQP_FLWHEEL
+    2300008: MQP_FRWHEEL
+    2300010: MQP_GLASS
+    2300012: MQP_INTERIOR
+    2300014: MQP_LICENSE
+    2300016: MQP_RWHEELS
+    3300000: Box001
+    3300002: MQP_BADGES
+    3300004: MQP_BODY
+    3300006: MQP_FLWHEEL
+    3300008: MQP_FRWHEEL
+    3300010: MQP_GLASS
+    3300012: MQP_INTERIOR
+    3300014: MQP_LICENSE
+    3300016: MQP_RWHEELS
+    4300000: MQP_BODY
+    4300002: MQP_FLWHEEL
+    4300004: MQP_GLASS
+    4300006: MQP_LICENSE
+    4300008: MQP_INTERIOR
+    4300010: MQP_BADGES
+    4300012: MQP_RWHEELS
+    4300014: MQP_FRWHEEL
+    4300016: Box001
+    7400000: Take 001
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
