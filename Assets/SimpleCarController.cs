@@ -8,6 +8,11 @@ public class SimpleCarController : MonoBehaviour
     public float maxMotorTorque;//maximum torque the motor can apply
     public float maxSteeringAngle;//max steer angle the wheel can have
     
+    public void Start()
+    {
+        Rigidbody rb = GetComponent<Rigidbody>();
+        rb.centerOfMass = new Vector3(rb.centerOfMass.x, -1f, rb.centerOfMass.z);
+    }
     public void FixedUpdate()
     {
         float motor = maxMotorTorque * Input.GetAxis("Vertical");
@@ -44,7 +49,7 @@ public class SimpleCarController : MonoBehaviour
         visualWheel.transform.rotation = rotation;
 
         //now rotate the wheels 90 degrees, because the cylinder primitives don't have the correct rotation
-        visualWheel.transform.Rotate(0f, 0f, 90f);
+        //visualWheel.transform.Rotate(0f, 0f, 90f);
 
     }
 
