@@ -30,16 +30,9 @@ public class SimpleCarController : MonoBehaviour
 
         Debug.DrawRay(transform.position, rb.velocity);
 
-        //holding left trigger - brake
-        if (Input.GetAxisRaw("Fire1") > .05)
-        {
-            motor = maxMotorTorque * Input.GetAxisRaw("Fire1") * -1 * brakeMultiplier;
-        }
-        //holding right trigger - gas, but only if you're going less than your top speed
-        else if (Input.GetAxisRaw("Fire1") < -.05 && rb.velocity.magnitude * mpsToMph <= maxSpeed)
-        {
-            motor = maxMotorTorque * Input.GetAxisRaw("Fire1") * -1;
-        }
+        //get the torque the motor will apply based off of user input
+        motor = GetTorque();
+
         //for every wheel
         foreach(AxleInfo axleInfo in axleInfos)
         {
@@ -58,6 +51,33 @@ public class SimpleCarController : MonoBehaviour
             ApplyLocalPositionToVisuals(axleInfo.rightWheel);
 
         }
+    }
+    float GetTorque()
+    {
+        //holding left trigger - brake
+        if (Input.GetAxisRaw("Controller-Gas/Brake") > .05)
+        {
+            return maxMotorTorque * Input.GetAxisRaw("Controller-Gas/Brake") * -1 * brakeMultiplier;
+        }
+        //holding right trigger - gas, but only if you're going less than your top speed
+        else if (Input.GetAxisRaw("Controller-Gas/Brake") < -.05 && rb.velocity.magnitude * mpsToMph <= maxSpeed)
+        {
+            return maxMotorTorque * Input.GetAxisRaw("Controller-Gas/Brake") * -1;
+        }
+
+        //what a scrub, they must be using keyboard inputs
+
+        //holding left trigger - brake
+        else if (Input.GetAxisRaw("Keyboard-Gas/Brake") > .05)
+        {
+            return maxMotorTorque * Input.GetAxisRaw("Keyboard-Gas/Brake") * -1 * brakeMultiplier;
+        }
+        //holding right trigger - gas, but only if you're going less than your top speed
+        else if (Input.GetAxisRaw("Keyboard-Gas/Brake") < -.05 && rb.velocity.magnitude * mpsToMph <= maxSpeed)
+        {
+            return maxMotorTorque * Input.GetAxisRaw("Keyboard-Gas/Brake") * -1;
+        }
+        else return 0;
     }
     //used to make the front wheels rotate
     public void ApplyLocalPositionToVisuals(WheelCollider collider)
