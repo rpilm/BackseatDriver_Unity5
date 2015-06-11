@@ -7,9 +7,12 @@ public class NavNode : MonoBehaviour {
     //modified by NodeGraph
     public HashSet<NavNode> neighbors;
 
+    private Road parentRoad;
+
     public void Initialize()
     {
         neighbors = new HashSet<NavNode>();
+        parentRoad = transform.GetComponentInParent<Road>();
     }
 
 	// Use this for initialization
@@ -21,6 +24,14 @@ public class NavNode : MonoBehaviour {
     {
         //check for neighbors
         
+    }
+
+    public string getRoadName()
+    {
+        if (parentRoad != null)
+            return parentRoad.name;
+        else
+            return null;
     }
 
     public void addNeighbor(NavNode n)

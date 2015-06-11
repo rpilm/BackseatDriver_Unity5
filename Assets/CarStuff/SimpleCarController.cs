@@ -14,6 +14,8 @@ public class SimpleCarController : MonoBehaviour
     [HideInInspector]
     public float mpsToMph = 2.23694f;
 
+    private string currentRoad;
+
     public void Start()
     {
         rb= GetComponent<Rigidbody>();
@@ -97,6 +99,21 @@ public class SimpleCarController : MonoBehaviour
         //the speed to display in MPH, floored to zero when it is insignificantly small
         float velmph = 2.23694f * rb.velocity.magnitude; if (velmph < .1f) velmph = 0;
             GUI.Label(new Rect(0, 0, 150, 100), "Speed: " + velmph + " MPH");
+            GUI.Label(new Rect(0, 150, 150, 100), "Road: " + currentRoad);
+
+    }
+
+    void OnTriggerEnter(Collider c)
+    {
+        int roadLayer = LayerMask.NameToLayer("Road");
+        if (c.gameObject.layer == roadLayer){
+            string n = c.gameObject.GetComponent<NavNode>().getRoadName();
+            //if it's an intersection, it doesn't have a road name
+            if (n != null)
+            {
+                currentRoad = n;
+            }
+        }
     }
 
 }
