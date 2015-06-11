@@ -52,46 +52,20 @@ public class NodeGraph : MonoBehaviour {
                     /*if two nodes are not on the same street, there must be an intersection somewhere
                      * make sure that neither node is an intersection to start with, they should form regular connections automatically
                      */
-                    if (node1.gameObject.transform.parent != node2.gameObject.transform.parent 
-                        && !node1.gameObject.GetComponent<Intersection>()
-                        && !node2.gameObject.GetComponent<Intersection>())
-                    {
-                        bool found = false;
-                        //find their shared intersection
-                        foreach (Intersection i in allIntersections)
-                        {
-                            if (node1.gameObject.GetComponent<BoxCollider>().bounds.Intersects(i.gameObject.GetComponent<BoxCollider>().bounds) &&
-                                node2.gameObject.GetComponent<BoxCollider>().bounds.Intersects(i.gameObject.GetComponent<BoxCollider>().bounds))
-                            {
-                                NavNode iNav = i.gameObject.GetComponent<NavNode>();
-                                iNav.addNeighbor(node1);
-                                iNav.addNeighbor(node2);
-                                found = true;
-
-                                //debug coloring
-                                MeshRenderer mr = iNav.gameObject.GetComponent<MeshRenderer>();
-                                mr.material.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
-
-                                lr.SetVertexCount(3);
-                                lr.SetPosition(0, node1.gameObject.transform.position);
-                                lr.SetPosition(1, iNav.gameObject.transform.position);
-                                lr.SetPosition(2, node2.gameObject.transform.position);
-                                break;
-                            }
-                        }
-                        if (!found)
-                        {
-                            Debug.LogError("Could not find intersection of nodes.");
-                        }
-                    }
-                    else
+                    if (node1.gameObject.transform.parent == node2.gameObject.transform.parent)
                     {
                         node1.addNeighbor(node2);
                         lr.SetVertexCount(2);
                         lr.SetPosition(0, node1.gameObject.transform.position);
                         lr.SetPosition(1, node2.gameObject.transform.position);
                     }
-                    
+                    else if (node1.gameObject.GetComponent<Intersection>() || node2.gameObject.GetComponent<Intersection>())
+                    {
+                        node1.addNeighbor(node2);
+                        lr.SetVertexCount(2);
+                        lr.SetPosition(0, node1.gameObject.transform.position);
+                        lr.SetPosition(1, node2.gameObject.transform.position);
+                    }
                 }
             }
         }
