@@ -21,14 +21,6 @@ public class NodeGraph : MonoBehaviour {
 
     void GenerateGraph()
     {
-        /* Algorithm:
-         * if two nodes overlap:
-         *      check if they are on the same road
-         *      if so, give them a link
-         *      if not, find the shared intersection, and have them both connect to the intersection
-         *          if no intersection found, throw error
-         */
-
         foreach (NavNode node in allNodes)
         {
             node.Initialize();
@@ -45,8 +37,8 @@ public class NodeGraph : MonoBehaviour {
 
                     //line to denote linked roads
                     //debug use only
-                    GameObject link = Instantiate(line) as GameObject;
-                    LineRenderer lr = link.GetComponent<LineRenderer>();
+                    GameObject link;
+                    LineRenderer lr;
                     
 
                     /*if two nodes are not on the same street, there must be an intersection somewhere
@@ -54,14 +46,18 @@ public class NodeGraph : MonoBehaviour {
                      */
                     if (node1.gameObject.transform.parent == node2.gameObject.transform.parent)
                     {
-                        node1.addNeighbor(node2);
+                        link = Instantiate(line) as GameObject;
+                        lr = link.GetComponent<LineRenderer>();
+                        node1.addNeighbor(node2, link);
                         lr.SetVertexCount(2);
                         lr.SetPosition(0, node1.gameObject.transform.position);
                         lr.SetPosition(1, node2.gameObject.transform.position);
                     }
                     else if (node1.gameObject.GetComponent<Intersection>() || node2.gameObject.GetComponent<Intersection>())
                     {
-                        node1.addNeighbor(node2);
+                        link = Instantiate(line) as GameObject;
+                        lr = link.GetComponent<LineRenderer>();
+                        node1.addNeighbor(node2, link);
                         lr.SetVertexCount(2);
                         lr.SetPosition(0, node1.gameObject.transform.position);
                         lr.SetPosition(1, node2.gameObject.transform.position);
