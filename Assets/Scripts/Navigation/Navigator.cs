@@ -117,7 +117,6 @@ public class Navigator : MonoBehaviour {
             }
             currentNode = nextNode;
             string n = currentNode.getRoadName();
-            Debug.Log(n);
             //if it's an intersection, it doesn't have a road name
             if (n != null)
             {
@@ -133,6 +132,6 @@ public class Navigator : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+        //Debug.Log(GameControl.SquaredInput("Keyboard-Gas/Brake"));
 	}
 }
