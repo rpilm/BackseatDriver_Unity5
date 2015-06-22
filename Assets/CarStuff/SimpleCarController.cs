@@ -29,6 +29,8 @@ public class SimpleCarController : MonoBehaviour
             else return rb.velocity.magnitude * mpsToMph;
         }
     }
+    private float steering = 0f;
+
 
     public void Start()
     {
@@ -47,7 +49,9 @@ public class SimpleCarController : MonoBehaviour
     void UpdateMotorAndSteering()
     {
         float motor = 0;
-        float steering = maxSteeringAngle * Input.GetAxis("Horizontal");
+        //squaring the input will allow minut stick inputs to weight less than heavy ones,making it easier to do minor adjustments
+        float squaredInput = GameControl.SquaredInput("Horizontal");
+        steering = Mathf.Lerp(steering, maxSteeringAngle * squaredInput, .1f);
         Debug.DrawRay(transform.position, rb.velocity);
 
         //get the torque the motor will apply based off of user input
@@ -75,14 +79,14 @@ public class SimpleCarController : MonoBehaviour
     float GetTorque()
     {
         //holding left trigger - brake
-        if (Input.GetAxisRaw("Controller-Gas/Brake") > .05 && speedInMph > -1* maxReverseVel)
+        if (Input.GetAxisRaw("Controller-Gas/Brake") < .05 && speedInMph > -1* maxReverseVel)
         {
-            return maxMotorTorque * Input.GetAxisRaw("Controller-Gas/Brake") * -1 * brakeMultiplier;
+            return maxMotorTorque * GameControl.SquaredInput("Controller-Gas/Brake") * brakeMultiplier;
         }
         //holding right trigger - gas, but only if you're going less than your top speed
-        else if (Input.GetAxisRaw("Controller-Gas/Brake") < -.05 && speedInMph <= maxSpeed)
+        else if (Input.GetAxisRaw("Controller-Gas/Brake") > -.05 && speedInMph <= maxSpeed)
         {
-            return maxMotorTorque * Input.GetAxisRaw("Controller-Gas/Brake") * -1;
+            return maxMotorTorque * GameControl.SquaredInput("Controller-Gas/Brake");
         }
 
         //what a scrub, they must be using keyboard inputs
@@ -90,12 +94,12 @@ public class SimpleCarController : MonoBehaviour
         //holding left trigger - brake
         else if (Input.GetAxisRaw("Keyboard-Gas/Brake") > .05 && speedInMph >= -1 * maxReverseVel)
         {
-            return maxMotorTorque * Input.GetAxisRaw("Keyboard-Gas/Brake") * -1 * brakeMultiplier;
+            return maxMotorTorque * GameControl.SquaredInput("Keyboard-Gas/Brake") * -1 * brakeMultiplier;
         }
         //holding right trigger - gas, but only if you're going less than your top speed
         else if (Input.GetAxisRaw("Keyboard-Gas/Brake") < -.05 && speedInMph <= maxSpeed)
         {
-            return maxMotorTorque * Input.GetAxisRaw("Keyboard-Gas/Brake") * -1;
+            return maxMotorTorque * GameControl.SquaredInput("Keyboard-Gas/Brake") * -1;
         }
         else return 0;
     }
@@ -120,7 +124,6 @@ public class SimpleCarController : MonoBehaviour
             velmph = 0;
 
         GUI.Label(new Rect(0, 0, 150, 100), "Speed: " + velmph + " MPH");
-
     }
 }
 
