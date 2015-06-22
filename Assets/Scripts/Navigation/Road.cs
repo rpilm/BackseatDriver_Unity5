@@ -3,7 +3,8 @@ using System.Collections;
 
 public class Road : MonoBehaviour {
 
-    public string name;
+    [SerializeField]        //so it's editable in Inspector, but not mutable in code
+    private string roadName;
 
     private NavNode[] roadNodes;
 
@@ -21,6 +22,11 @@ public class Road : MonoBehaviour {
             Debug.LogError("GameObject " + node.name + " does not contain a NavNode");
         }
         return n;
+    }
+
+    public string getRoadName()
+    {
+        return roadName;
     }
 	
 	// Update is called once per frame
