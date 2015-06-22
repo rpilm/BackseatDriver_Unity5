@@ -13,9 +13,9 @@ public class FirstPersonCamera : MonoBehaviour
         //assign a ref to our car controller
         carController = transform.root.GetComponent<SimpleCarController>();
         //instantiate our first person camera
-        GameObject dummy = (GameObject)Resources.Load("TheMainCamera");
-        dummy = Instantiate(dummy, transform.position, transform.rotation) as GameObject;
-        cam = dummy.transform;
+        //GameObject dummy = (GameObject)Resources.Load("TheMainCamera");
+        //dummy = Instantiate(dummy, transform.position, transform.rotation) as GameObject;
+		cam = GameObject.Find("TheMainCamera").transform;
     }
     void Update()
     {
