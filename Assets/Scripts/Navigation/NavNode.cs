@@ -166,6 +166,12 @@ public class NavNode : MonoBehaviour {
         {
             foreach (NavNode n in neighbors)
             {
+                /* Colors:
+                 * Red: on path
+                 * Blue: (only when "debug whole network" 
+                 * is marked in NodeGraph), connected 
+                 */
+
                 Color lineColor = Color.white;
                 if (n.onPath )
                 {
@@ -175,7 +181,9 @@ public class NavNode : MonoBehaviour {
                 {
                     lineColor = Color.blue;
                 }
-                Debug.DrawLine(transform.position, n.transform.position, lineColor);
+                //have to assign it to get around errors
+                if (lineColor != Color.white)
+                    Debug.DrawLine(transform.position, n.transform.position, lineColor);
             }
         }
 	}
