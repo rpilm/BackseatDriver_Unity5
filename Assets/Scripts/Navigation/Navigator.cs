@@ -16,7 +16,7 @@ public class Navigator : MonoBehaviour {
     //recalculated when driver is off the path
     private Stack<NavNode> path;
     private NodeGraph graph;
-    private string currentRoad;
+    private string currentRoadName;
     private NavNode currentNode;
     private bool followingPath;
 
@@ -33,7 +33,7 @@ public class Navigator : MonoBehaviour {
 
     void OnRoadsConnected()
     {
-        //PerformPathfinding();
+        PerformPathfinding();
     }
 
 
@@ -102,7 +102,7 @@ public class Navigator : MonoBehaviour {
         
     }
 
-    void OnTriggerEnter(Collider c)
+    void OnTriggerStay(Collider c)
     {
         int roadLayer = LayerMask.NameToLayer("Road");
         if (c.gameObject.layer == roadLayer)
@@ -110,24 +110,29 @@ public class Navigator : MonoBehaviour {
             NavNode nextNode = c.gameObject.GetComponent<NavNode>();
             if (followingPath)
             {
-                if (nextNode == path.Peek())
+                /*if (nextNode == path.Peek())
                 {
                     path.Pop();
-                }
+                }*/
             }
             currentNode = nextNode;
             string n = currentNode.getRoadName();
             //if it's an intersection, it doesn't have a road name
             if (n != null)
             {
-                currentRoad = n;
+                currentRoadName = n;
             }
         }
     }
 
+    void OnTriggerExit(Collider c)
+    {
+        currentRoadName = "N/A";
+    }
+
     void OnGUI()
     {
-        GUI.Label(new Rect(0, 150, 150, 100), "Road: " + currentRoad);
+        GUI.Label(new Rect(0, 150, 150, 100), "Road: " + currentRoadName);
     }
 	
 	// Update is called once per frame

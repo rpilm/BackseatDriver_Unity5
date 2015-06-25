@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(BoxCollider))]
 public class NavNode : MonoBehaviour {
     //triggered by the LateUpdate after the road formation
     public delegate void OnRoadsConnectedHandler();
@@ -21,6 +22,9 @@ public class NavNode : MonoBehaviour {
     private Road parentRoad;
     private bool initialized = false;
     private bool isIntersection;
+    
+    //states to determine when to initialize pathfinding
+    
 
     public void Initialize()
     {
@@ -33,6 +37,7 @@ public class NavNode : MonoBehaviour {
         roadsConnected = false;
         onPath = false;
         isIntersection = GetComponent<Intersection>();
+        //nodeGraph.pathfindingInitializer.registerNode(this);
     }
 
 	// Use this for initialization
@@ -48,19 +53,27 @@ public class NavNode : MonoBehaviour {
     {
         if (initialized)
         {
+
+            //mark it in the pathfinding initializer
+            //nodeGraph.pathfindingInitializer.markRoadChecked(this);
+
             //check for neighbors
             NavNode other = c.gameObject.GetComponent<NavNode>();
             if (other != null)
             {
-                if (parentRoad == other.parentRoad && !isIntersection)
-                {
                     //error if there are three overlapping road segments from same road
+                if (parentRoad == other.parentRoad || other.isIntersection)
+                {
                     if (neighbors.Count == 2)
                     {
                         Debug.LogError("ERROR: More than two Road Segments from " + parentRoad.getRoadName() + " overlapping");
                     }
-                    GameObject newLine = Instantiate(nodeGraph.line) as GameObject;
-                    addNeighborIndividual(other, newLine);
+                    else
+                    {
+                        GameObject newLine = Instantiate(nodeGraph.line) as GameObject;
+                        addNeighborIndividual(other, newLine);
+                    }
+                
                 }
                 else if (isIntersection)
                 {
@@ -92,25 +105,32 @@ public class NavNode : MonoBehaviour {
     public void startPathfinding(Stack<NavNode> path, Transform tf,
         Dictionary<NavNode, bool> visitDict)
     {
+        //first make sure all nodes are remotely reachable
+        /*if (!nodeGraph.pathfindingInitializer.areAllNodesInitialized())
+        {
+            Debug.LogError("ERROR: not all nodes reachable");
+        }*/
+        Debug.Log("Pathfinding...");
         foreach (NavNode n in neighbors)
         {
             //check each neighbor, use one that is less than 90 degrees in front of it
-            Vector3 dir = NavNode.vecToNode(tf, n) ;
+            Vector3 dir = NavNode.vecToNode(tf, n);
             if (Vector3.Dot(dir, tf.forward) > 0)
             {
+
                 bool found = n.explore(path, visitDict);
                 if (found)
                 {
                     path.Push(n);
-                    lineDict[n].GetComponent<LineRenderer>().SetColors(new Color(1f, 0f, 0f, 1f), new Color(1f, 0f, 0f, 1f));
+                    lineDict[n].GetComponent<LineRenderer>().SetColors(new Color(1f, 0f, 0f, 1f), new Color(0f, 0f, 1f, 1f));
                 }
             }
-        }
+        }    
     }
 
     public bool explore(Stack<NavNode> path,  Dictionary<NavNode, bool> visitDict)
     {
-        onPath = true;
+        Debug.DrawLine(transform.position, transform.position+10*Vector3.up, Color.white ,10f, false);
         visitDict[this] = true;
         if (!destination)
         {
@@ -122,7 +142,8 @@ public class NavNode : MonoBehaviour {
                     if (found)
                     {
                         path.Push(n);
-                        lineDict[n].GetComponent<LineRenderer>().SetColors(new Color(1f, 0f, 0f, 1f), new Color(1f, 0f, 0f, 1f));
+                        onPath = true;
+                        lineDict[n].GetComponent<LineRenderer>().SetColors(new Color(1f, 0f, 0f, 1f), new Color(0f, 1f, 1f, 1f));
                         return true;
                     }
                 }
