@@ -11,9 +11,6 @@ public class NavNode : MonoBehaviour {
 
     public List<NavNode> neighbors;
     
-    [HideInInspector]
-    //maps link to a neighbor with the line renderer connecting them for debug purposes
-    public Dictionary<NavNode, GameObject> lineDict;
     public bool destination = false;
     public int numNeighbors;
     public bool onPath = false;
@@ -29,7 +26,6 @@ public class NavNode : MonoBehaviour {
     public void Initialize()
     {
         nodeGraph = GameObject.FindGameObjectWithTag("RoadGraph").GetComponent<NodeGraph>();
-        lineDict = new Dictionary<NavNode, GameObject>();
         neighbors = new List<NavNode>();
         parentRoad = transform.GetComponentInParent<Road>();
         initialized = true;
@@ -37,7 +33,6 @@ public class NavNode : MonoBehaviour {
         roadsConnected = false;
         onPath = false;
         isIntersection = GetComponent<Intersection>();
-        //nodeGraph.pathfindingInitializer.registerNode(this);
     }
 
 	// Use this for initialization
@@ -53,10 +48,6 @@ public class NavNode : MonoBehaviour {
     {
         if (initialized)
         {
-
-            //mark it in the pathfinding initializer
-            //nodeGraph.pathfindingInitializer.markRoadChecked(this);
-
             //check for neighbors
             NavNode other = c.gameObject.GetComponent<NavNode>();
             if (other != null)
@@ -70,15 +61,13 @@ public class NavNode : MonoBehaviour {
                     }
                     else
                     {
-                        GameObject newLine = Instantiate(nodeGraph.line) as GameObject;
-                        addNeighborIndividual(other, newLine);
+                        addNeighborIndividual(other);
                     }
                 
                 }
                 else if (isIntersection)
                 {
-                    GameObject newLine = Instantiate(nodeGraph.line) as GameObject;
-                    addNeighborIndividual(other, newLine);
+                    addNeighborIndividual(other);
                 }
             }
         }
@@ -105,11 +94,6 @@ public class NavNode : MonoBehaviour {
     public void startPathfinding(Stack<NavNode> path, Transform tf,
         Dictionary<NavNode, bool> visitDict)
     {
-        //first make sure all nodes are remotely reachable
-        /*if (!nodeGraph.pathfindingInitializer.areAllNodesInitialized())
-        {
-            Debug.LogError("ERROR: not all nodes reachable");
-        }*/
         Debug.Log("Pathfinding...");
         foreach (NavNode n in neighbors)
         {
@@ -122,7 +106,7 @@ public class NavNode : MonoBehaviour {
                 if (found)
                 {
                     path.Push(n);
-                    lineDict[n].GetComponent<LineRenderer>().SetColors(new Color(1f, 0f, 0f, 1f), new Color(0f, 0f, 1f, 1f));
+
                 }
             }
         }    
@@ -130,7 +114,6 @@ public class NavNode : MonoBehaviour {
 
     public bool explore(Stack<NavNode> path,  Dictionary<NavNode, bool> visitDict)
     {
-        Debug.DrawLine(transform.position, transform.position+10*Vector3.up, Color.white ,10f, false);
         visitDict[this] = true;
         if (!destination)
         {
@@ -143,7 +126,6 @@ public class NavNode : MonoBehaviour {
                     {
                         path.Push(n);
                         onPath = true;
-                        lineDict[n].GetComponent<LineRenderer>().SetColors(new Color(1f, 0f, 0f, 1f), new Color(0f, 1f, 1f, 1f));
                         return true;
                     }
                 }
@@ -156,33 +138,19 @@ public class NavNode : MonoBehaviour {
         }
     }
 
-    public void addNeighborMutual(NavNode n, GameObject line)
+    public void addNeighborMutual(NavNode n)
     {
         //is mutual
         neighbors.Add(n);
         n.neighbors.Add(this);
 
-        if(!lineDict.ContainsKey(n))
-            lineDict.Add(n, line);
-        if (!lineDict.ContainsKey(this))
-            n.lineDict.Add(this, line);
-
-        LineRenderer lr = line.GetComponent<LineRenderer>();
-        lr.SetVertexCount(2);
-        lr.SetPosition(0, gameObject.transform.position);
-        lr.SetPosition(1, n.gameObject.transform.position);
         numNeighbors++;
         n.numNeighbors++;
     }
 
-    public void addNeighborIndividual(NavNode n, GameObject line)
+    public void addNeighborIndividual(NavNode n)
     {
         neighbors.Add(n);
-        lineDict.Add(n, line);
-        LineRenderer lr = line.GetComponent<LineRenderer>();
-        lr.SetVertexCount(2);
-        lr.SetPosition(0, gameObject.transform.position);
-        lr.SetPosition(1, n.gameObject.transform.position);
         numNeighbors++;
     }
 	
@@ -191,6 +159,24 @@ public class NavNode : MonoBehaviour {
         if (destination)
         {
             gameObject.GetComponent<MeshRenderer>().material.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+        }
+
+        //so you don't do it if they are not marked
+        if (nodeGraph.debugWholeNetwork || onPath)
+        {
+            foreach (NavNode n in neighbors)
+            {
+                Color lineColor = Color.white;
+                if (n.onPath )
+                {
+                    lineColor = Color.red;
+                }
+                else if (nodeGraph.debugWholeNetwork)
+                {
+                    lineColor = Color.blue;
+                }
+                Debug.DrawLine(transform.position, n.transform.position, lineColor);
+            }
         }
 	}
 
