@@ -33,7 +33,7 @@ public class FirstPersonCamera : MonoBehaviour
         //create a new direction vector that is rotated rotationAngle degrees from the car's forward direction
         Vector3 newCamDir = Quaternion.AngleAxis(rotationAngle, Vector3.up) * transform.root.forward;
 
-        if (carController.speedInMph < 3)   //if the car is travelling backwards juts ignore everything we just did and look forward
+        if (carController.speedInMph < 0)   //if the car is travelling backwards juts ignore everything we just did and look forward
             newCamDir = transform.root.forward;
 
         //now LERP our rotation towards our newCamDir 
@@ -48,13 +48,5 @@ public class FirstPersonCamera : MonoBehaviour
         Debug.DrawRay(transform.position, carController.rb.velocity, Color.magenta);
         Debug.DrawRay(transform.position, transform.root.forward, Color.yellow);
         Debug.DrawRay(transform.position, transform.forward, Color.cyan);
-    }
-    void OnDisable()
-    {
-        //cam.gameObject.SetActive(false);
-    }
-    void OnEnable()
-    {
-        //cam.gameObject.SetActive(true);
     }
 }
