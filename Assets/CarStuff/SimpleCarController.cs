@@ -5,9 +5,10 @@ using System.Collections.Generic;
 public class SimpleCarController : MonoBehaviour 
 {
     public List<AxleInfo> axleInfos;    //the info about each indiv axle
-    public float maxMotorTorque;        //maximum torque the motor can apply
-    public float maxSteeringAngle;      //max steer angle the wheel can have
-    public float brakeMultiplier;       //how much more torque do the brakes do, scaled from maxMotorTorque
+    public float maxForwardTorque;        //maximum torque the motor can apply forward
+    public float maxBackwardTorque;        //maximum torque the motor can apply backward
+    public float brakeTorque;       //how much torque do the brakes do
+    public float maxSteeringAngle;      //max steer angle the wheel can have 
     public float maxSpeed;           //the fastest the car can go forward
     public float maxReverseVel;        //fastest the car can go backward
     [HideInInspector]
@@ -78,28 +79,38 @@ public class SimpleCarController : MonoBehaviour
     }
     float GetTorque()
     {
-        //holding left trigger - brake
-        if (Input.GetAxisRaw("Controller-Gas/Brake") < .05 && speedInMph > -1* maxReverseVel)
+        //holding left trigger - brake  
+        if (Input.GetAxisRaw("Controller-Gas/Brake") < .05 && speedInMph > 10)
         {
-            return maxMotorTorque * GameControl.SquaredInput("Controller-Gas/Brake") * brakeMultiplier;
+            return brakeTorque * GameControl.SquaredInput("Controller-Gas/Brake");
+        }
+        //holding left trigger - go in reverse 
+        else if (Input.GetAxisRaw("Controller-Gas/Brake") < .05 && speedInMph > -1* maxReverseVel)
+        {
+            return maxBackwardTorque * GameControl.SquaredInput("Controller-Gas/Brake");
         }
         //holding right trigger - gas, but only if you're going less than your top speed
         else if (Input.GetAxisRaw("Controller-Gas/Brake") > -.05 && speedInMph <= maxSpeed)
         {
-            return maxMotorTorque * GameControl.SquaredInput("Controller-Gas/Brake");
+            return maxForwardTorque * GameControl.SquaredInput("Controller-Gas/Brake");
         }
 
         //what a scrub, they must be using keyboard inputs
 
-        //holding left trigger - brake
-        else if (Input.GetAxisRaw("Keyboard-Gas/Brake") > .05 && speedInMph >= -1 * maxReverseVel)
+        //holding left trigger - brake  
+        else if (Input.GetAxisRaw("Keyboard-Gas/Brake") < .05 && speedInMph > 10)
         {
-            return maxMotorTorque * GameControl.SquaredInput("Keyboard-Gas/Brake") * -1 * brakeMultiplier;
+            return brakeTorque * GameControl.SquaredInput("Keyboard-Gas/Brake");
+        }
+        //holding left trigger - go in reverse 
+        else if (Input.GetAxisRaw("Keyboard-Gas/Brake") < .05 && speedInMph > -1 * maxReverseVel)
+        {
+            return maxBackwardTorque * GameControl.SquaredInput("Keyboard-Gas/Brake");
         }
         //holding right trigger - gas, but only if you're going less than your top speed
         else if (Input.GetAxisRaw("Keyboard-Gas/Brake") < -.05 && speedInMph <= maxSpeed)
         {
-            return maxMotorTorque * GameControl.SquaredInput("Keyboard-Gas/Brake") * -1;
+            return maxForwardTorque * GameControl.SquaredInput("Keyboard-Gas/Brake") * -1;
         }
         else return 0;
     }

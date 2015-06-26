@@ -13,6 +13,7 @@ public class ThirdPersonCameraHandle : MonoBehaviour
     {
         //assign a ref to our car controller
         carController = transform.root.GetComponent<SimpleCarController>();
+        cam = GameObject.FindGameObjectWithTag("MainCamera").transform;
 	}
 	void Update () 
     {

@@ -5,17 +5,22 @@ public class FirstPersonCamera : MonoBehaviour
 {
     public Transform cam { get; set; }
     public SimpleCarController carController { get; set; }
-    public float maxHeading;
-    public float maxStickHeading;
+
+    public float maxHeading;//how far can the head cam turn in either direction, from the cars forward vector
+    public float maxRightStickHeading;//how far can the right stick input add to the existing angle
+
+    public float camLerpSpeed;//used in the transform.forward = Lerp... line, should be less than .5f
+    public float stickHeldInfluenceTime;//holding the left stick will influence how fast the cma lerp happens until this long in seconds
+    public float stickNotHeldInfluenceTime;//similar to above, but this is used to make the camera lerp back forward slower and smoother
+
 
     void Awake()
     {
         //assign a ref to our car controller
         carController = transform.root.GetComponent<SimpleCarController>();
-        //instantiate our first person camera
-        //GameObject dummy = (GameObject)Resources.Load("TheMainCamera");
-        //dummy = Instantiate(dummy, transform.position, transform.rotation) as GameObject;
-		cam = GameObject.Find("TheMainCamera").transform;
+        
+        //find our main camera
+        cam = GameObject.FindGameObjectWithTag("MainCamera").transform;
     }
     void Update()
     {
@@ -27,9 +32,9 @@ public class FirstPersonCamera : MonoBehaviour
         float sign = Mathf.Sign(transform.root.InverseTransformPoint(transform.root.position + carController.rb.velocity).x);
         float rotationAngle = sign * Vector3.Angle(transform.root.forward, carController.rb.velocity);
         //modify that angle
-        rotationAngle *= Mathf.Clamp(GameControl.horizontalAxisHeldFor / 1f, 0, 1); //angle the camera into the turn more based on how long the left stick is held
-        rotationAngle += maxStickHeading * GameControl.SquaredInput("2ndStickX"); //add the squared influence from the right stick independantly control the head
-        rotationAngle = Mathf.Clamp(rotationAngle, -maxHeading, maxHeading); //clamp the rotation so the camera doesn't turn more than the heading
+        rotationAngle *= StickHoldTimeInfluence(); //angle the camera into the turn more based on how long the left stick is held
+        rotationAngle += maxRightStickHeading * GameControl.SquaredInput("2ndStickX"); //add the squared influence from the right stick to independantly control the head
+        rotationAngle = Mathf.Clamp(rotationAngle, -maxHeading, maxHeading); //clamp the rotation so the camera doesn't turn more than the Max heading
         //create a new direction vector that is rotated rotationAngle degrees from the car's forward direction
         Vector3 newCamDir = Quaternion.AngleAxis(rotationAngle, Vector3.up) * transform.root.forward;
 
@@ -37,7 +42,7 @@ public class FirstPersonCamera : MonoBehaviour
             newCamDir = transform.root.forward;
 
         //now LERP our rotation towards our newCamDir 
-        transform.forward = Vector3.Lerp(transform.forward, newCamDir, .25f);
+        transform.forward = Vector3.Lerp(transform.forward, newCamDir, camLerpSpeed);
 
         //update the cam's position and rotation based off our position and rotation
         cam.position = transform.position;
@@ -48,5 +53,13 @@ public class FirstPersonCamera : MonoBehaviour
         Debug.DrawRay(transform.position, carController.rb.velocity, Color.magenta);
         Debug.DrawRay(transform.position, transform.root.forward, Color.yellow);
         Debug.DrawRay(transform.position, transform.forward, Color.cyan);
+    }
+
+    //this will lerp up to 1 based on how long the left stick has been held, 
+    //then lerp back down to 0 based on how long the stick hasn't been held
+    float StickHoldTimeInfluence()
+    {
+        return Mathf.Clamp(GameControl.horizontalAxisHeldFor / stickHeldInfluenceTime, 0, 1) + 
+            (1 - Mathf.Clamp(GameControl.horizontalAxisNotHeldFor / stickNotHeldInfluenceTime, 0, 1));
     }
 }

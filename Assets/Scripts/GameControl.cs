@@ -19,14 +19,22 @@ public class GameControl : MonoBehaviour
     }
     //returns the number of seconds the horizontal axis has been held in a direction for since it was last 0
     public static float horizontalAxisHeldFor;
+    public static float horizontalAxisNotHeldFor;
     IEnumerator StickHeldUpdater()
     {
         while(true)
         {
             if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) > .15f)
+            {
                 horizontalAxisHeldFor += Time.deltaTime;
+                horizontalAxisNotHeldFor = 0;
+            }
             else
+            {
                 horizontalAxisHeldFor = 0;
+                horizontalAxisNotHeldFor += Time.deltaTime;
+            }
+            
 
             yield return null;
         }
