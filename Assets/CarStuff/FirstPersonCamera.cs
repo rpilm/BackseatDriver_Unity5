@@ -33,12 +33,13 @@ public class FirstPersonCamera : MonoBehaviour
         float rotationAngle = sign * Vector3.Angle(transform.root.forward, carController.rb.velocity);
         //modify that angle
         rotationAngle *= StickHoldTimeInfluence(); //angle the camera into the turn more based on how long the left stick is held
-        rotationAngle += maxRightStickHeading * GameControl.SquaredInput("2ndStickX"); //add the squared influence from the right stick to independantly control the head
+        rotationAngle *= Mathf.Clamp(carController.speedInMph / 30,0f, 3f);
+        rotationAngle += maxRightStickHeading * BSDInput.SquaredInput("2ndStickX"); //add the squared influence from the right stick to independantly control the head
         rotationAngle = Mathf.Clamp(rotationAngle, -maxHeading, maxHeading); //clamp the rotation so the camera doesn't turn more than the Max heading
         //create a new direction vector that is rotated rotationAngle degrees from the car's forward direction
         Vector3 newCamDir = Quaternion.AngleAxis(rotationAngle, Vector3.up) * transform.root.forward;
 
-        if (carController.speedInMph < 0)   //if the car is travelling backwards juts ignore everything we just did and look forward
+        if (carController.speedInMph < 1)   //if the car is travelling backwards juts ignore everything we just did and look forward
             newCamDir = transform.root.forward;
 
         //now LERP our rotation towards our newCamDir 
@@ -59,7 +60,9 @@ public class FirstPersonCamera : MonoBehaviour
     //then lerp back down to 0 based on how long the stick hasn't been held
     float StickHoldTimeInfluence()
     {
-        return Mathf.Clamp(GameControl.horizontalAxisHeldFor / stickHeldInfluenceTime, 0, 1) + 
-            (1 - Mathf.Clamp(GameControl.horizontalAxisNotHeldFor / stickNotHeldInfluenceTime, 0, 1));
+        float HeldInfluence = (BSDInput.horizontalAxisHeldFor / stickHeldInfluenceTime) * Mathf.Abs(BSDInput.SquaredInput("Horizontal"));
+        float NotHeldInfluence = (BSDInput.horizontalAxisNotHeldFor / stickNotHeldInfluenceTime);
+
+        return Mathf.Clamp01(HeldInfluence) +(1 - Mathf.Clamp01(NotHeldInfluence));
     }
 }
