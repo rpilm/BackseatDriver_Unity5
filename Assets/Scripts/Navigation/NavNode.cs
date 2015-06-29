@@ -9,19 +9,17 @@ public class NavNode : MonoBehaviour {
     public static event OnRoadsConnectedHandler OnRoadsConnected;
     public static bool roadsConnected;
 
-    public List<NavNode> neighbors;
-    
+    public List<NavNode> neighbors;    
     public bool destination = false;
     public int numNeighbors;
     public bool onPath = false;
+    public NavNode nextInPath;
 
     private NodeGraph nodeGraph;
     private Road parentRoad;
     private bool initialized = false;
     private bool isIntersection;
-    
-    //states to determine when to initialize pathfinding
-    
+       
 
     public void Initialize()
     {
@@ -105,8 +103,10 @@ public class NavNode : MonoBehaviour {
                 bool found = n.explore(path, visitDict);
                 if (found)
                 {
+                    onPath = true;
                     path.Push(n);
-
+                    nextInPath = n;
+                    //path.Push(this);
                 }
             }
         }    
@@ -124,6 +124,7 @@ public class NavNode : MonoBehaviour {
                     bool found = n.explore(path, visitDict);
                     if (found)
                     {
+                        nextInPath = n;
                         path.Push(n);
                         onPath = true;
                         return true;
@@ -134,6 +135,7 @@ public class NavNode : MonoBehaviour {
         }
         else
         {
+            onPath = true;
             return true;
         }
     }
@@ -162,28 +164,15 @@ public class NavNode : MonoBehaviour {
         }
 
         //so you don't do it if they are not marked
-        if (nodeGraph.debugWholeNetwork || onPath)
+        if (onPath && nextInPath != null)
+        {
+            Debug.DrawLine(transform.position, (nextInPath.transform.position-transform.position).normalized*20f+transform.position, Color.red);
+        }
+        else if (nodeGraph.drawWholeNetwork)
         {
             foreach (NavNode n in neighbors)
             {
-                /* Colors:
-                 * Red: on path
-                 * Blue: (only when "debug whole network" 
-                 * is marked in NodeGraph), connected 
-                 */
-
-                Color lineColor = Color.white;
-                if (n.onPath )
-                {
-                    lineColor = Color.red;
-                }
-                else if (nodeGraph.debugWholeNetwork)
-                {
-                    lineColor = Color.blue;
-                }
-                //have to assign it to get around errors
-                if (lineColor != Color.white)
-                    Debug.DrawLine(transform.position, n.transform.position, lineColor);
+                Debug.DrawLine(transform.position, n.transform.position, Color.blue);
             }
         }
 	}

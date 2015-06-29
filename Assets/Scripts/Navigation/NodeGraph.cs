@@ -8,7 +8,7 @@ using System.Collections.Generic;
 public class NodeGraph : MonoBehaviour
 {
     
-    public bool debugWholeNetwork = false;
+    public bool drawWholeNetwork = false;
 
     private NavNode[] allNodes;
     private Intersection[] allIntersections;
