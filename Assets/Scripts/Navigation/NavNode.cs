@@ -21,11 +21,6 @@ public class NavNode : MonoBehaviour {
     private bool isIntersection;
 
 
-    public void Awake()
-    {
-
-    }
-
     public void Initialize()
     {
         nodeGraph = GameObject.FindGameObjectWithTag("RoadGraph").GetComponent<NodeGraph>();

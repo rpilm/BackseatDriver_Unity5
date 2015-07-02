@@ -63,52 +63,67 @@ public class Navigator : MonoBehaviour {
         //TODO: actually implement this, like trigger an event and/or broadcast
         if (path.Peek() != currentNode)
         {
-            Debug.Log("WRONG WAY!!");
-            Debug.Log("Anticipated: " + path.Peek() + " Actual: " + currentNode);
-        }
-        else
-        {
-            path.Pop();
-            NavNode nextNodeInPath = path.Peek();
-            if (nextNodeInPath.GetComponent<Intersection>())
+            if (path.Contains(currentNode))
             {
-                Debug.Log("Next node is an intersection, pay attention!!");
+                int counter = 0;
+                //node is still in the path, they made a shortcut!
+                //keep going
+                while (path.Peek() != currentNode)
+                {
+                    counter++;
+                    path.Pop();
+                }
+                Debug.Log("Took a shortcut over " + counter + " nodes");
             }
             else
             {
-                Debug.Log("Next node in path is on " + nextNodeInPath.getRoadName());
+                Debug.Log("WRONG WAY!!");
+                Debug.Log("Anticipated: " + path.Peek() + " Actual: " + currentNode);
+                return;
             }
+        }
 
-            if (currentNode.GetComponent<Intersection>())
+        path.Pop();
+        NavNode nextNodeInPath = path.Peek();
+        if (nextNodeInPath.GetComponent<Intersection>())
+        {
+            Debug.Log("Next node is an intersection, pay attention!!");
+        }
+        else
+        {
+            Debug.Log("Next node in path is on " + nextNodeInPath.getRoadName());
+        }
+
+        if (currentNode.GetComponent<Intersection>())
+        {
+            //figure out which way you're going
+            foreach (NavNode n in currentNode.getNeighbors())
             {
-                //figure out which way you're going
-                foreach (NavNode n in currentNode.getNeighbors())
+                //if the next node is an intersection, start telling them where to go
+                if (n == nextNodeInPath)
                 {
-                    //if the next node is an intersection, start telling them where to go
-                    if (n == nextNodeInPath)
+                    Vector3 directionToNode = NavNode.vecToNode(transform, n).normalized;
+                    float angleToNode = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(transform.right, directionToNode));
+                    Debug.Log("Angle " + angleToNode);
+                    if (angleToNode < 90 - directionalTolerance)
                     {
-                        Vector3 directionToNode = NavNode.vecToNode(transform, n).normalized;
-                        float angleToNode = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(transform.right, directionToNode));
-                        Debug.Log("Angle " + angleToNode);
-                        if (angleToNode < 90 - directionalTolerance)
-                        {
-                            //right side
-                            Debug.Log("TURN RIGHT onto " + n.getRoadName() + "!!");
-                        }
-                        else if (angleToNode > 90 + directionalTolerance)
-                        {
-                            //left side
-                            Debug.Log("TURN LEFT onto " + n.getRoadName() + "!!");
-                        }
-                        else
-                        {
-                            //straight
-                            Debug.Log("GO STRAIGHT onto " + n.getRoadName() + "!!");
-                        }
+                        //right side
+                        Debug.Log("TURN RIGHT onto " + n.getRoadName() + "!!");
+                    }
+                    else if (angleToNode > 90 + directionalTolerance)
+                    {
+                        //left side
+                        Debug.Log("TURN LEFT onto " + n.getRoadName() + "!!");
+                    }
+                    else
+                    {
+                        //straight
+                        Debug.Log("GO STRAIGHT onto " + n.getRoadName() + "!!");
                     }
                 }
             }
         }
+        
 
 
         
