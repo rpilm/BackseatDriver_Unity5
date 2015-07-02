@@ -11,7 +11,7 @@ public class Navigator : MonoBehaviour {
 
     //defines wiggle room for considering a road "straight ahead"
     public float directionalTolerance = 10f;
-
+    public bool shortcutsEnabled = true;
 
     //FIFO to hold the current path for navigation
     //recalculated when driver is off the path
@@ -56,6 +56,7 @@ public class Navigator : MonoBehaviour {
             //should behave like this even if the destination is an intersection
             Debug.Log("Found destination!  Xièxie!");
             currentNode.destination = false;
+            followingPath = false;
             return;
         }
 
@@ -63,7 +64,7 @@ public class Navigator : MonoBehaviour {
         //TODO: actually implement this, like trigger an event and/or broadcast
         if (path.Peek() != currentNode)
         {
-            if (path.Contains(currentNode))
+            if (path.Contains(currentNode) && shortcutsEnabled)
             {
                 int counter = 0;
                 //node is still in the path, they made a shortcut!

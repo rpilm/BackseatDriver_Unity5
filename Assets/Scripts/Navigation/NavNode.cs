@@ -161,13 +161,17 @@ public class NavNode : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (destination)
+        MeshRenderer mr = GetComponent<MeshRenderer>();
+        if (mr.enabled)
         {
-            gameObject.GetComponent<MeshRenderer>().material.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
-        }
-        else
-        {
-            gameObject.GetComponent<MeshRenderer>().material.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+            if (destination)
+            {
+                gameObject.GetComponent<MeshRenderer>().material.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+            }
+            else
+            {
+                gameObject.GetComponent<MeshRenderer>().material.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+            }
         }
 
         //so you don't do it if they are not marked
