@@ -6,6 +6,7 @@ using System.Collections.Generic;
  * handle all the navigation functions.
  */
 
+[RequireComponent(typeof(Collider))]
 public class Navigator : MonoBehaviour {
 
     //defines wiggle room for considering a road "straight ahead"
@@ -25,7 +26,7 @@ public class Navigator : MonoBehaviour {
 
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         path = new Stack<NavNode>();
         graph = GameObject.FindGameObjectWithTag("RoadGraph").GetComponent<NodeGraph>();
         followingPath = false;
@@ -48,43 +49,69 @@ public class Navigator : MonoBehaviour {
 
     void Navigate()
     {
+        
         if (currentNode.destination)
         {
             //finish pathfinding, unmark as destination
             //should behave like this even if the destination is an intersection
             Debug.Log("Found destination!  Xièxie!");
             currentNode.destination = false;
+            return;
         }
-        else if (currentNode.GetComponent<Intersection>())
+
+        //check you're on the right track
+        //TODO: actually implement this, like trigger an event and/or broadcast
+        if (path.Peek() != currentNode)
         {
+            Debug.Log("WRONG WAY!!");
+            Debug.Log("Anticipated: " + path.Peek() + " Actual: " + currentNode);
+        }
+        else
+        {
+            path.Pop();
             NavNode nextNodeInPath = path.Peek();
-            //figure out which way you're going
-            foreach (NavNode n in currentNode.getNeighbors())
+            if (nextNodeInPath.GetComponent<Intersection>())
             {
-                //if the next node is an intersection, start telling them where to go
-                if (n == nextNodeInPath)
+                Debug.Log("Next node is an intersection, pay attention!!");
+            }
+            else
+            {
+                Debug.Log("Next node in path is on " + nextNodeInPath.getRoadName());
+            }
+
+            if (currentNode.GetComponent<Intersection>())
+            {
+                //figure out which way you're going
+                foreach (NavNode n in currentNode.getNeighbors())
                 {
-                    Vector3 directionToNode = NavNode.vecToNode(transform, n).normalized;
-                    float angleToNode = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(transform.right, directionToNode));
-                    Debug.Log("Angle " + angleToNode);
-                    if (angleToNode < 90 - directionalTolerance)
+                    //if the next node is an intersection, start telling them where to go
+                    if (n == nextNodeInPath)
                     {
-                        //right side
-                        Debug.Log("TURN RIGHT onto " + n.getRoadName() + "!!");
-                    }
-                    else if (angleToNode > 90 + directionalTolerance)
-                    {
-                        //left side
-                        Debug.Log("TURN LEFT onto " + n.getRoadName() + "!!");
-                    }
-                    else
-                    {
-                        //straight
-                        Debug.Log("GO STRAIGHT onto " + n.getRoadName() + "!!");
+                        Vector3 directionToNode = NavNode.vecToNode(transform, n).normalized;
+                        float angleToNode = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(transform.right, directionToNode));
+                        Debug.Log("Angle " + angleToNode);
+                        if (angleToNode < 90 - directionalTolerance)
+                        {
+                            //right side
+                            Debug.Log("TURN RIGHT onto " + n.getRoadName() + "!!");
+                        }
+                        else if (angleToNode > 90 + directionalTolerance)
+                        {
+                            //left side
+                            Debug.Log("TURN LEFT onto " + n.getRoadName() + "!!");
+                        }
+                        else
+                        {
+                            //straight
+                            Debug.Log("GO STRAIGHT onto " + n.getRoadName() + "!!");
+                        }
                     }
                 }
             }
         }
+
+
+        
     }
 
     void FormPath()
@@ -110,43 +137,17 @@ public class Navigator : MonoBehaviour {
 
     void OnTriggerEnter(Collider c)
     {
+        /* It's being called 5 times because of each collider on the car
+         * such as the four wheels and the body are triggering this, so
+         * detect if it is the parent */
 
-        int roadLayer = LayerMask.NameToLayer("Road");
-        if (c.gameObject.layer == roadLayer)
+        NavNode collidingNode = c.gameObject.GetComponent<NavNode>();
+        if (collidingNode != null)
         {
             currentNode = c.gameObject.GetComponent<NavNode>();
-            Navigate();
-                        
-        }
-            /*
-            NavNode nextNode = c.gameObject.GetComponent<NavNode>();
             if (followingPath)
-            {
                 Navigate();
-
-                if (nextNode == path.Peek())
-                {
-                    path.Pop();
-                }
-            }
-            currentNode = nextNode;
-            plannedNode = currentNode.nextInPath;
             string n = currentNode.getRoadName();
-            //if it's an intersection, it doesn't have a road name
-            if (n != null)
-            {
-                currentRoadName = n;
-            }
-        }*/
-    }
-
-    void OnTriggerStay(Collider c)
-    {
-        int roadLayer = LayerMask.NameToLayer("Road");
-        if (c.gameObject.layer == roadLayer)
-        {
-            string n = currentNode.getRoadName();
-            //if it's an intersection, it doesn't have a road name
             if (n != null)
             {
                 currentRoadName = n;
@@ -156,7 +157,7 @@ public class Navigator : MonoBehaviour {
 
     void OnTriggerExit(Collider c)
     {
-        currentRoadName = "N/A";
+        //currentRoadName = "N/A";
     }
 
     void OnGUI()

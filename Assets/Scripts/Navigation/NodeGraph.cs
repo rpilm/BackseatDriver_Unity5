@@ -14,7 +14,7 @@ public class NodeGraph : MonoBehaviour
     private Intersection[] allIntersections;
 
     // Use this for initialization
-    void Awake()
+    void Start()
     {
         allNodes = GetComponentsInChildren<NavNode>();
         allIntersections = GetComponentsInChildren<Intersection>();

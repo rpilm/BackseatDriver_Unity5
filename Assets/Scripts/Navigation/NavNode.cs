@@ -19,7 +19,12 @@ public class NavNode : MonoBehaviour {
     private Road parentRoad;
     private bool initialized = false;
     private bool isIntersection;
-       
+
+
+    public void Awake()
+    {
+
+    }
 
     public void Initialize()
     {
@@ -31,6 +36,10 @@ public class NavNode : MonoBehaviour {
         roadsConnected = false;
         onPath = false;
         isIntersection = GetComponent<Intersection>();
+        if (OnRoadsConnected != null)
+        {
+            OnRoadsConnected = new OnRoadsConnectedHandler(OnRoadsConnected);
+        }
     }
 
 	// Use this for initialization
@@ -92,7 +101,7 @@ public class NavNode : MonoBehaviour {
     public void startPathfinding(Stack<NavNode> path, Transform tf,
         Dictionary<NavNode, bool> visitDict)
     {
-        Debug.Log("Pathfinding...");
+        Debug.Log("Pathfinding...Starting node is " + gameObject);
         foreach (NavNode n in neighbors)
         {
             //check each neighbor, use one that is less than 90 degrees in front of it
@@ -106,7 +115,6 @@ public class NavNode : MonoBehaviour {
                     onPath = true;
                     path.Push(n);
                     nextInPath = n;
-                    //path.Push(this);
                 }
             }
         }    
@@ -162,6 +170,10 @@ public class NavNode : MonoBehaviour {
         {
             gameObject.GetComponent<MeshRenderer>().material.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
         }
+        else
+        {
+            gameObject.GetComponent<MeshRenderer>().material.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+        }
 
         //so you don't do it if they are not marked
         if (onPath && nextInPath != null)
@@ -172,7 +184,8 @@ public class NavNode : MonoBehaviour {
         {
             foreach (NavNode n in neighbors)
             {
-                Debug.DrawLine(transform.position, n.transform.position, Color.blue);
+                if (!n.onPath)
+                    Debug.DrawLine(transform.position, n.transform.position, Color.blue);
             }
         }
 	}
@@ -180,7 +193,7 @@ public class NavNode : MonoBehaviour {
     void LateUpdate()
     {
         //should occur after all the linkages?
-        if (!roadsConnected)
+        if (!roadsConnected && OnRoadsConnected != null)
         {
             OnRoadsConnected();
             roadsConnected = true;
