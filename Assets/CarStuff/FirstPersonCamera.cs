@@ -34,7 +34,7 @@ public class FirstPersonCamera : MonoBehaviour
         //modify that angle
         rotationAngle *= StickHoldTimeInfluence(); //angle the camera into the turn more based on how long the left stick is held
         rotationAngle *= Mathf.Clamp(carController.speedInMph / 30,0f, 3f);
-        rotationAngle += maxRightStickHeading * BSDInput.SquaredInput("2ndStickX"); //add the squared influence from the right stick to independantly control the head
+        // rotationAngle += maxRightStickHeading * BSDInput.SquaredInput("2ndStickX"); //add the squared influence from the right stick to independantly control the head
         rotationAngle = Mathf.Clamp(rotationAngle, -maxHeading, maxHeading); //clamp the rotation so the camera doesn't turn more than the Max heading
         //create a new direction vector that is rotated rotationAngle degrees from the car's forward direction
         Vector3 newCamDir = Quaternion.AngleAxis(rotationAngle, Vector3.up) * transform.root.forward;

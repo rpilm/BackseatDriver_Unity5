@@ -5,19 +5,17 @@ public class BSDInput
 {
     public static float Horizontal
     {
-        get{
-            if (Input.GetAxisRaw("Horizontal-Keyboard") != 0)
-                return Input.GetAxis("Horizontal-Keyboard");
-            else return Input.GetAxisRaw("Horizontal-Controller"); 
-        }set { }
+        get
+        {
+            return Input.GetAxis("Steering");
+        }
+        set { }
     }
     public static float Gas_Brake
     {
         get
         {
-            if (Input.GetAxisRaw("Gas_Brake-Keyboard") != 0)
-                return Input.GetAxis("Gas_Brake-Keyboard");
-            else return Input.GetAxisRaw("Gas_Brake-Controller");
+            return Input.GetAxis("Acceleration");
         }
         set { }
     }
@@ -37,15 +35,11 @@ public class BSDInput
         //special cases where we don't know if a controller or keyboard is being used
         if(axisName == "Horizontal")
         {
-            if (Input.GetAxisRaw("Horizontal-Keyboard") != 0)
-                axisName = "Horizontal-Keyboard";
-            else axisName = "Horizontal-Controller";
+            axisName = "Steering";
         }
         else if (axisName == "Gas_Brake")
         {
-            if (Input.GetAxisRaw("Gas_Brake-Keyboard") != 0)
-                axisName = "Gas_Brake-Keyboard";
-            else axisName = "Gas_Brake-Controller";
+            axisName = "Acceleration";
         }
 
         //okay now just calculate the signed squared input

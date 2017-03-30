@@ -26,7 +26,7 @@ public class ThirdPersonCameraHandle : MonoBehaviour
         float rotationAngle = sign * Vector3.Angle(transform.root.forward, carController.rb.velocity);//times 2 for greater weighting from the velocity
         //modify that angle
         rotationAngle *= Mathf.Clamp(BSDInput.horizontalAxisHeldFor / .5f, 0, 10) * carController.speedInMph/carController.maxSpeed; //angle the camera into the turn more based on how long the left stick is held
-        rotationAngle += maxStickHeading * BSDInput.SquaredInput("2ndStickX"); //add the squared influence from the right stick independantly control the head
+        // rotationAngle += maxStickHeading * BSDInput.SquaredInput("2ndStickX"); //add the squared influence from the right stick independantly control the head
         rotationAngle = Mathf.Clamp(rotationAngle, -maxHeading, maxHeading); //clamp the rotation so the camera doesn't turn more than the heading
         //create a new direction vector that is rotated rotationAngle degrees from the car's forward direction
         Vector3 newCamDir = Quaternion.AngleAxis(rotationAngle, Vector3.up) * transform.root.forward;
