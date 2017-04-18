@@ -3,17 +3,21 @@ using System.Collections;
 
 public class ThirdPersonCameraHandle : MonoBehaviour 
 {
-    public Transform cam { get; set; }
+    public Transform cam;
     public SimpleCarController carController { get; set; }
 
     public float maxHeading;
     public float maxStickHeading;
 
+    public float maxCamOffset;
+
+    Vector3 originalPos;
+
 	void Awake () 
     {
         //assign a ref to our car controller
         carController = transform.root.GetComponent<SimpleCarController>();
-        cam = GameObject.FindGameObjectWithTag("MainCamera").transform;
+        originalPos = cam.localPosition;
 	}
 	void Update () 
     {
@@ -37,6 +41,20 @@ public class ThirdPersonCameraHandle : MonoBehaviour
         //now LERP our rotation towards our newCamDir 
         transform.forward = Vector3.Lerp(transform.forward, newCamDir, .25f);
 
+        // adjust camera distance for car speed
+        float camDist = 0.0f;
+        if (carController.speedInMph > 0)
+        {
+            camDist = carController.speedInMph / 7.0f;
+        }
+
+        // clamp at the max offset
+        if (camDist > maxCamOffset)
+            camDist = maxCamOffset;
+
+        Vector3 newCamPos = originalPos - camDist * Vector3.forward;
+
+        cam.localPosition = Vector3.Lerp(cam.localPosition, newCamPos, 0.5f);
 	}
 
 }

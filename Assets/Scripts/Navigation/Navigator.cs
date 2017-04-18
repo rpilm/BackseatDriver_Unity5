@@ -28,7 +28,9 @@ public class Navigator : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
         path = new Stack<NavNode>();
-        graph = GameObject.FindGameObjectWithTag("RoadGraph").GetComponent<NodeGraph>();
+        GameObject graphObj = GameObject.FindGameObjectWithTag("RoadGraph");
+        if (graphObj != null)
+            graph = graphObj.GetComponent<NodeGraph>();
         followingPath = false;
 
         //subscribe to road completion event
