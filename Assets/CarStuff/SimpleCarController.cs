@@ -8,6 +8,7 @@ public class SimpleCarController : MonoBehaviour
     public float maxForwardTorque;        //maximum torque the motor can apply forward
     public float maxBackwardTorque;        //maximum torque the motor can apply backward
     public float brakeTorque;       //how much torque do the brakes do
+    public float frictionAmount;          // how much to slow down without gas
     public float maxSteeringAngle;      //max steer angle the wheel can have 
     public float maxSpeed;           //the fastest the car can go forward
     public float maxReverseVel;        //fastest the car can go backward
@@ -80,7 +81,7 @@ public class SimpleCarController : MonoBehaviour
     float GetTorque()
     {
         //holding left trigger - brake 
-        if(BSDInput.Gas_Brake < -.05 && speedInMph > 10)
+        if (BSDInput.Gas_Brake < -.05 && speedInMph > 10)
         {
             return brakeTorque * BSDInput.SquaredInput("Gas_Brake");
         }
@@ -93,8 +94,12 @@ public class SimpleCarController : MonoBehaviour
         {
             return maxForwardTorque * BSDInput.SquaredInput("Gas_Brake");
         }
+        // apply damping to slow down when there is nothing pressed
+        else if (Mathf.Abs(BSDInput.Gas_Brake) < 0.05 && Mathf.Abs(speedInMph) > 0.001)
+        {
+            return frictionAmount * -Mathf.Sign(speedInMph);
+        }
 
-        
         else return 0;
     }
     //used to make the front wheels rotate
