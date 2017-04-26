@@ -95,9 +95,18 @@ public class SimpleCarController : MonoBehaviour
             return maxForwardTorque * BSDInput.SquaredInput("Gas_Brake");
         }
         // apply damping to slow down when there is nothing pressed
-        else if (Mathf.Abs(BSDInput.Gas_Brake) < 0.05 && Mathf.Abs(speedInMph) > 0.001)
+        else if (Mathf.Abs(BSDInput.Gas_Brake) < 0.05 && Mathf.Abs(speedInMph) > 0.01f)
         {
-            return frictionAmount * -Mathf.Sign(speedInMph);
+            float t = frictionAmount * -(speedInMph);
+            Debug.Log("friction torque: " + t);
+            if (Mathf.Abs(t) > 10.0f)
+            {
+                return t;
+            }
+            else
+            {
+                return 0.0f;
+            }
         }
 
         else return 0;
