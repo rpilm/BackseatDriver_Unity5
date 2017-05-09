@@ -15,6 +15,7 @@ public class NavNode : MonoBehaviour {
     public bool onPath = false;
     public NavNode nextInPath;
 
+	private NavNode parentInPath;
     private NodeGraph nodeGraph;
     private Road parentRoad;
     private bool initialized = false;
@@ -36,6 +37,13 @@ public class NavNode : MonoBehaviour {
             OnRoadsConnected = new OnRoadsConnectedHandler(OnRoadsConnected);
         }
     }
+
+	public void Reset()
+	{
+		onPath = false;
+		nextInPath = null;
+		parentInPath = null;
+	}
 
 	// Use this for initialization
 	void Start () {
@@ -93,54 +101,71 @@ public class NavNode : MonoBehaviour {
         return neighbors;
     }
 
-    public void startPathfinding(Stack<NavNode> path, Transform tf,
-        Dictionary<NavNode, bool> visitDict)
+     public void startPathfinding(Stack<NavNode> path, Transform tf,
+        NavNode dest, Dictionary<NavNode, bool> visitDict)
     {
         Debug.Log("Pathfinding...Starting node is " + gameObject);
+
         foreach (NavNode n in neighbors)
         {
             //check each neighbor, use one that is less than 90 degrees in front of it
             Vector3 dir = NavNode.vecToNode(tf, n);
             if (Vector3.Dot(dir, tf.forward) > 0)
             {
+				bool found = n.explore(visitDict);
 
-                bool found = n.explore(path, visitDict);
-                if (found)
-                {
-                    onPath = true;
-                    path.Push(n);
-                    nextInPath = n;
-                }
+				if (found)
+				{
+					onPath = true;
+					nextInPath = n;
+
+					NavNode p = dest;
+					while (p != n)
+					{
+						p.onPath = true;
+						path.Push(p);
+						p.parentInPath.nextInPath = p;
+
+						p = p.parentInPath;
+					}
+					p.onPath = true;
+					path.Push(p);
+
+					// only do this for one node
+					return;
+				}
             }
-        }    
+        }
     }
 
-    public bool explore(Stack<NavNode> path,  Dictionary<NavNode, bool> visitDict)
+    public bool explore(Dictionary<NavNode, bool> visitDict)
     {
-        visitDict[this] = true;
-        if (!destination)
-        {
-            foreach (NavNode n in neighbors)
-            {
-                if (!visitDict[n])
-                {
-                    bool found = n.explore(path, visitDict);
-                    if (found)
-                    {
-                        nextInPath = n;
-                        path.Push(n);
-                        onPath = true;
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-        else
-        {
-            onPath = true;
-            return true;
-        }
+		Queue<NavNode> toExplore = new Queue<NavNode>();
+		toExplore.Enqueue(this);
+		visitDict[this] = true;
+
+		while (toExplore.Count > 0)
+		{
+			NavNode cur = toExplore.Dequeue();
+			if (cur.destination)
+			{
+				cur.onPath = true;
+				cur.nextInPath = cur.parentInPath;
+				return true;
+			}
+
+			foreach (NavNode n in cur.neighbors)
+			{
+				if (!visitDict[n])
+				{
+					visitDict[n] = true;
+					n.parentInPath = cur;
+					toExplore.Enqueue(n);
+				}
+			}
+		}
+
+		return false;
     }
 
     public void addNeighborMutual(NavNode n)
@@ -177,7 +202,10 @@ public class NavNode : MonoBehaviour {
         //so you don't do it if they are not marked
         if (onPath && nextInPath != null)
         {
-            Debug.DrawLine(transform.position, (nextInPath.transform.position-transform.position).normalized*20f+transform.position, Color.red);
+			Vector3 direction = nextInPath.transform.position - transform.position;
+
+
+			Debug.DrawLine(transform.position, 0.75f*direction+transform.position, Color.red);
         }
         else if (nodeGraph.drawWholeNetwork)
         {

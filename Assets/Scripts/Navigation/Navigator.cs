@@ -44,7 +44,12 @@ public class Navigator : MonoBehaviour {
 
     void InitializePathfinding()
 	{
+		// reset all nodes to be off the path
 		path = new Stack<NavNode>();
+		foreach (NavNode n in graph.getAllNodes())
+		{
+			n.Reset();
+		}
         FormPath();
         followingPath = true;
     }
@@ -76,7 +81,7 @@ public class Navigator : MonoBehaviour {
                     counter++;
                     path.Pop();
                 }
-                Debug.Log("Took a shortcut over " + counter + " nodes");
+				Debug.Log("Took a shortcut over " + counter + " nodes to " + path.Peek());
             }
             else
             {
@@ -90,6 +95,7 @@ public class Navigator : MonoBehaviour {
         }
 
         path.Pop();
+
         NavNode nextNodeInPath = path.Peek();
         if (nextNodeInPath.GetComponent<Intersection>())
         {
@@ -97,7 +103,7 @@ public class Navigator : MonoBehaviour {
         }
         else
         {
-            Debug.Log("Next node in path is on " + nextNodeInPath.getRoadName());
+			Debug.Log("Next node in path is on " + nextNodeInPath.getRoadName() + ":" + nextNodeInPath);
         }
 
         if (currentNode.GetComponent<Intersection>())
@@ -138,21 +144,26 @@ public class Navigator : MonoBehaviour {
     void FormPath()
     {
         /* Algorithm:
-         * Basic DFS (because not having it be the shortest path might be funny)
-         * For the NavNode that the car is currently in:
-         *      do a dot product to ensure the node is in front of the player
-         *      mark node as visited
-         *      check if destination, if not, continue
-         * when search is done, mark all as unvisited
+         * Use BFS to find the shortest path
+         * NOTE: possible upgrade to djikstra's if edges are weighted by distance
+         * First find destination node and explore toward the player location
          */
 
         //make dictionary to map visited status with each node
         Dictionary<NavNode, bool> visitDict = new Dictionary<NavNode, bool>();
+		NavNode destination = null;
         foreach (NavNode n in graph.getAllNodes())
         {
             visitDict.Add(n, false);
+			if (n.destination) // assuming only one destination at a time
+			{
+				destination = n;
+			}
         }
-        currentNode.startPathfinding(path, gameObject.transform, visitDict);
+		if (destination != null) 
+		{
+			currentNode.startPathfinding(path, gameObject.transform, destination, visitDict);
+		}
         
     }
 
@@ -165,7 +176,7 @@ public class Navigator : MonoBehaviour {
         NavNode collidingNode = c.gameObject.GetComponent<NavNode>();
         if (collidingNode != null)
         {
-            currentNode = c.gameObject.GetComponent<NavNode>();
+            currentNode = collidingNode;
             if (followingPath)
                 Navigate();
             string n = currentNode.getRoadName();
