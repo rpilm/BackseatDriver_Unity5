@@ -27,7 +27,6 @@ public class Navigator : MonoBehaviour {
 
 	// Use this for initialization
 	void Awake () {
-        path = new Stack<NavNode>();
         GameObject graphObj = GameObject.FindGameObjectWithTag("RoadGraph");
         if (graphObj != null)
             graph = graphObj.GetComponent<NodeGraph>();
@@ -44,7 +43,8 @@ public class Navigator : MonoBehaviour {
 
 
     void InitializePathfinding()
-    {
+	{
+		path = new Stack<NavNode>();
         FormPath();
         followingPath = true;
     }
@@ -82,6 +82,9 @@ public class Navigator : MonoBehaviour {
             {
                 Debug.Log("WRONG WAY!!");
                 Debug.Log("Anticipated: " + path.Peek() + " Actual: " + currentNode);
+
+				// rebuild a new path
+				InitializePathfinding();
                 return;
             }
         }
