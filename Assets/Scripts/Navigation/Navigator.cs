@@ -86,8 +86,7 @@ public class Navigator : MonoBehaviour {
             else
             {
                 Debug.Log("WRONG WAY!!");
-                Debug.Log("Anticipated: " + path.Peek() + " Actual: " + currentNode);
-
+                
 				// rebuild a new path
 				InitializePathfinding();
                 return;
@@ -115,22 +114,31 @@ public class Navigator : MonoBehaviour {
                 if (n == nextNodeInPath)
                 {
                     Vector3 directionToNode = NavNode.vecToNode(transform, n).normalized;
-                    float angleToNode = Mathf.Rad2Deg * Mathf.Acos(Vector3.Dot(transform.right, directionToNode));
-                    Debug.Log("Angle " + angleToNode);
-                    if (angleToNode < 90 - directionalTolerance)
+                    float angleOfCar = Mathf.Atan2(transform.forward.z, transform.forward.x);
+                    float angleOfPath = Mathf.Atan2(directionToNode.z, directionToNode.x);
+
+                    float angleToNode = Mathf.Rad2Deg * (angleOfCar - angleOfPath);
+
+                    Debug.Log("Angle: " + angleToNode);
+                    if (Mathf.Abs(angleToNode) <= directionalTolerance)
+                    {
+                        // Go straight ahead
+                        Debug.Log("CONTINUE STRAIGHT onto " + n.getRoadName() + "!!");
+                    }
+                    else if (Mathf.Abs(angleToNode - 180) <= directionalTolerance)
+                    {
+                        // U-turn
+                        Debug.Log("MAKE A U-TURN onto " + n.getRoadName() + "!!");
+                    }
+                    else if (angleToNode > directionalTolerance)
                     {
                         //right side
                         Debug.Log("TURN RIGHT onto " + n.getRoadName() + "!!");
                     }
-                    else if (angleToNode > 90 + directionalTolerance)
+                    else // if (angleToNode > directionalTolerance)
                     {
                         //left side
                         Debug.Log("TURN LEFT onto " + n.getRoadName() + "!!");
-                    }
-                    else
-                    {
-                        //straight
-                        Debug.Log("GO STRAIGHT onto " + n.getRoadName() + "!!");
                     }
                 }
             }
