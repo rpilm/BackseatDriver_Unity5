@@ -5,6 +5,7 @@ using System.Collections.Generic;
 /** Holds the graph data structure formed by street intersections,
  * Determines the graph dynamically */
 
+[ExecuteInEditMode]
 public class NodeGraph : MonoBehaviour
 {
     
@@ -14,7 +15,7 @@ public class NodeGraph : MonoBehaviour
     private Intersection[] allIntersections;
 
     // Use this for initialization
-    void Start()
+    void Awake()
     {
         allNodes = GetComponentsInChildren<NavNode>();
         allIntersections = GetComponentsInChildren<Intersection>();

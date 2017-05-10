@@ -2,6 +2,7 @@
 using System.Collections;
 
 [RequireComponent(typeof(NavNode))]
+[ExecuteInEditMode]
 public class Intersection : MonoBehaviour {
 
     private NavNode attachedNode;

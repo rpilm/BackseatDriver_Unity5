@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(BoxCollider))]
+[ExecuteInEditMode]
 public class NavNode : MonoBehaviour {
     //triggered by the LateUpdate after the road formation
     public delegate void OnRoadsConnectedHandler();
@@ -183,39 +184,37 @@ public class NavNode : MonoBehaviour {
         neighbors.Add(n);
         numNeighbors++;
     }
-	
-	// Update is called once per frame
-	void Update () {
-        MeshRenderer mr = GetComponent<MeshRenderer>();
-        if (mr.enabled)
+
+    void OnDrawGizmos() 
+    {
+        // mark the destination first
+        if (destination)
+            Gizmos.DrawIcon(transform.position, "destination.png", true);
+
+        if (nodeGraph != null)
         {
-            if (destination)
+            if (nodeGraph.drawWholeNetwork && !onPath && nextInPath == null)
             {
-                gameObject.GetComponent<MeshRenderer>().material.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+                foreach (NavNode n in neighbors)
+                {
+                    if (!n.onPath)
+                        Debug.DrawLine(transform.position, n.transform.position, Color.blue);
+                }
             }
-            else
+            else if //so you don't do it if they are not marked
+            (onPath && nextInPath != null)
             {
-                gameObject.GetComponent<MeshRenderer>().material.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
-            }
-        }
-
-        //so you don't do it if they are not marked
-        if (onPath && nextInPath != null)
-        {
-			Vector3 direction = nextInPath.transform.position - transform.position;
+                Vector3 direction = nextInPath.transform.position - transform.position;
 
 
-			Debug.DrawLine(transform.position, 0.75f*direction+transform.position, Color.red);
-        }
-        else if (nodeGraph.drawWholeNetwork)
-        {
-            foreach (NavNode n in neighbors)
-            {
-                if (!n.onPath)
-                    Debug.DrawLine(transform.position, n.transform.position, Color.blue);
+                Debug.DrawLine(transform.position, 0.75f*direction+transform.position, Color.red);
             }
         }
-	}
+    }
+
+    void Update() {
+        
+    }
 
     void LateUpdate()
     {

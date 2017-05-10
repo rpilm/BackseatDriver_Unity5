@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[ExecuteInEditMode]
 public class Road : MonoBehaviour {
 
     [SerializeField]        //so it's editable in Inspector, but not mutable in code
