@@ -106,39 +106,47 @@ public class NavNode : MonoBehaviour {
     {
         Debug.Log("Pathfinding...Starting node is " + gameObject);
 
-        foreach (NavNode n in neighbors)
+        float minAngle = 30f;
+        bool found = false;
+
+        while (!found)
         {
-            //check each neighbor, use one that is less than 90 degrees in front of it
-            Vector3 dir = NavNode.vecToNode(tf, n);
-            float angleDir = Mathf.Atan2(dir.z, dir.x);
-            float carDir = Mathf.Atan2(tf.forward.z, tf.forward.x);
-            float angleDifference = Mathf.Rad2Deg * (carDir - angleDir);
-
-            if (Mathf.Abs(angleDifference) < 135.0f)
+            foreach (NavNode n in neighbors)
             {
-				bool found = n.explore(visitDict, this);
+                //check each neighbor, use one that is less than 90 degrees in front of it
+                Vector3 dir = NavNode.vecToNode(tf, n);
+                float angleDir = Mathf.Atan2(dir.z, dir.x);
+                float carDir = Mathf.Atan2(tf.forward.z, tf.forward.x);
+                float angleDifference = Mathf.Rad2Deg * (carDir - angleDir);
 
-				if (found)
-				{
-					onPath = true;
-					nextInPath = n;
+                if (Mathf.Abs(angleDifference) < minAngle)
+                {
+                    found = n.explore(visitDict, this);
 
-					NavNode p = dest;
-					while (p != n)
-					{
-						p.onPath = true;
-						path.Push(p);
-						p.parentInPath.nextInPath = p;
+                    if (found)
+                    {
+                        onPath = true;
+                        nextInPath = n;
 
-						p = p.parentInPath;
-					}
-					p.onPath = true;
-					path.Push(p);
+                        NavNode p = dest;
+                        while (p != n)
+                        {
+                            p.onPath = true;
+                            path.Push(p);
+                            p.parentInPath.nextInPath = p;
 
-					// only do this for one node
-					return;
-				}
+                            p = p.parentInPath;
+                        }
+                        p.onPath = true;
+                        path.Push(p);
+
+                        // only do this for one node
+                        return;
+                    }
+                }
             }
+            // increase angle until we find a path
+            minAngle += 15f;
         }
     }
 

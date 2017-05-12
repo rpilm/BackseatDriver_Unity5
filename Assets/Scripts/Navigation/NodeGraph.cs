@@ -20,7 +20,7 @@ public class NodeGraph : MonoBehaviour
         allIntersections = GetComponentsInChildren<Intersection>();
         Debug.Log(allNodes.Length + " nodes present");
 
-        // setRandomDestination();
+        setRandomDestination();
     }
 
     public NavNode[] getAllNodes()
