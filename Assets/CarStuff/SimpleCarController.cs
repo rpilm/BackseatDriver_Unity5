@@ -53,7 +53,8 @@ public class SimpleCarController : MonoBehaviour
         float motor = 0;
         //squaring the input will allow minut stick inputs to weight less than heavy ones,making it easier to do minor adjustments
         float squaredInput = BSDInput.SquaredInput("Horizontal");
-        steering = Mathf.Lerp(steering, maxSteeringAngle * squaredInput, .1f);
+        float targetSteering = maxSteeringAngle * squaredInput;
+        steering = Mathf.Lerp(steering, targetSteering, .1f);
         Debug.DrawRay(transform.position, rb.velocity);
 
         //get the torque the motor will apply based off of user input
