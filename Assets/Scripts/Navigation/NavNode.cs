@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(BoxCollider))]
-[ExecuteInEditMode]
 public class NavNode : MonoBehaviour {
     //triggered by the LateUpdate after the road formation
     public delegate void OnRoadsConnectedHandler();
@@ -111,9 +110,13 @@ public class NavNode : MonoBehaviour {
         {
             //check each neighbor, use one that is less than 90 degrees in front of it
             Vector3 dir = NavNode.vecToNode(tf, n);
-            if (Vector3.Dot(dir, tf.forward) > 0)
+            float angleDir = Mathf.Atan2(dir.z, dir.x);
+            float carDir = Mathf.Atan2(tf.forward.z, tf.forward.x);
+            float angleDifference = Mathf.Rad2Deg * (carDir - angleDir);
+
+            if (Mathf.Abs(angleDifference) < 135.0f)
             {
-				bool found = n.explore(visitDict);
+				bool found = n.explore(visitDict, this);
 
 				if (found)
 				{
@@ -139,7 +142,7 @@ public class NavNode : MonoBehaviour {
         }
     }
 
-    public bool explore(Dictionary<NavNode, bool> visitDict)
+    public bool explore(Dictionary<NavNode, bool> visitDict, NavNode forbidden)
     {
 		Queue<NavNode> toExplore = new Queue<NavNode>();
 		toExplore.Enqueue(this);
@@ -157,7 +160,7 @@ public class NavNode : MonoBehaviour {
 
 			foreach (NavNode n in cur.neighbors)
 			{
-				if (!visitDict[n])
+				if (!visitDict[n] && n != forbidden)
 				{
 					visitDict[n] = true;
 					n.parentInPath = cur;

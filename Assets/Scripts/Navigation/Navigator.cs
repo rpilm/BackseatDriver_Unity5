@@ -64,6 +64,11 @@ public class Navigator : MonoBehaviour {
             Debug.Log("Found destination!  Xièxie!");
             currentNode.destination = false;
             followingPath = false;
+
+            // set new destination
+            graph.setRandomDestination();
+            InitializePathfinding();
+
             return;
         }
 
@@ -85,7 +90,8 @@ public class Navigator : MonoBehaviour {
             }
             else
             {
-                Debug.Log("WRONG WAY!!");
+                Debug.LogWarning("WRONG WAY!!");
+                Debug.Log("Expected " + currentNode + ", but got " + path.Peek());
                 
 				// rebuild a new path
 				InitializePathfinding();
